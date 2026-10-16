@@ -322,7 +322,7 @@ function stepShells(dt){
 }
 
 // ---- state, settings, panels
-const touchDevice=('ontouchstart' in window)||navigator.maxTouchPoints>0||(window.matchMedia&&matchMedia('(pointer:coarse)').matches);if(touchDevice){document.body.classList.add('touch-device');for(const b of document.querySelectorAll('#mn button')){const label=b.querySelector('span');if(label){b.setAttribute('aria-label',label.textContent);b.title=label.textContent}}$('bPlay').setAttribute('aria-label','Play or resume')}
+const touchDevice=('ontouchstart' in window)||navigator.maxTouchPoints>0||(window.matchMedia&&matchMedia('(pointer:coarse)').matches);if(touchDevice){document.body.classList.add('touch-device');for(const b of document.querySelectorAll('#mn button')){const label=b.querySelector('span');if(label){b.setAttribute('aria-label',label.textContent);b.title=label.textContent}}document.getElementById('bPlay').setAttribute('aria-label','Play or resume')}
 const keys={};let touchMoveX=0,touchMoveY=0,touchSprint=false,touchStickId=null,touchLookId=null,touchLookX=0,touchLookY=0,yaw=0,pitch=.25,locked=false,hadLock=false,rmb=false,fa=0,delT=0,sprinting=false,played=false,cur='home';
 const DEF={q:2,refl:1,vol:.8,sfx:1,amb:.35,mus:.35,nbv:1,sens:1,inv:0,fov:72,ws:6,sm:2.3,jh:1.1,pg:22,rstep:15,tstep:10,reach:45,gop:.45,bob:1,sfov:6,snap:0,
  tp:0,tpd:4.2,tph:2.3,tpside:.45,tpsm:.12,shk:1,hud:1,xh:1,xhs:16,xho:.7,hop:.85,sell:1,fps:0,cap:0,uis:1,chop:1,chfade:9,
