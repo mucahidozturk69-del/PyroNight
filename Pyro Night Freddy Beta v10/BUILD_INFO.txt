@@ -1,0 +1,14 @@
+PYRO NIGHT — CURRENT RENDER BUILD
+Version: v10 — Freddy beta
+
+This package includes:
+- Sanic and Mario Nextbots in the Special catalogue, with the supplied sprites and sounds.
+- Freddy Fazbear beta boss: 2320 HP, solo four-Chica launch, two-player Chica arming in multiplayer, firework blaster, stomp, star barrage, player throw, and nearby breakable build pieces.
+- A Reset all settings to defaults button in Settings.
+
+Controls: F = emote, X = light selected firework, E = catalogue, Backspace = remove selected item, / = chat, V = camera, I = settings, B = Freddy firework blaster.
+
+For updating the GitHub/Render project, use the full contents of this ZIP as the repository files. This ZIP is a local project package; it does not deploy to Render by itself.
+Render start command: node server/server.js
+
+Freddy is an early beta. This package was not launched for gameplay testing in this task.
