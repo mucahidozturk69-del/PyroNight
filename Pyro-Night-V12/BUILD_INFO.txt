@@ -1,0 +1,17 @@
+PYRO NIGHT — v12 MULTIPLAYER BOSS BETA
+
+This build contains:
+- The supplied player rig as a compact GLB, with ground-aware positioning, procedural idle and movement poses, and a body-colour picker in Settings.
+- The separately supplied Freddy rig as a GLB boss, multiplayer-only and host-started.
+- Freddy Beta: 2320 HP, animated attack poses, firework blaster, stomp, barrage, player throw and nearby breakable build pieces.
+- Two-player summon requirement: two players each place and light two of their own Chica fireworks.
+- Chaos Mode host switch retained in Multiplayer. Ignite All skips Chica fireworks while Chaos Mode is on and while Freddy is arming.
+- Five Special fireworks themed after the supplied Nextbot art, with distinct firework sprites and a power 1–10 catalogue sort.
+- Ground fountains route and save as regular fireworks; Flowery is selected only from its explicit Special entry.
+- WebSocket server GLB MIME support and synced player body colours.
+
+Local start: extract the complete ZIP, then run START_PYRO_NIGHT.vbs (Node.js 18+).
+Render start command: node server/server.js
+Render Root Directory: the folder containing index.html, assets/, lib/ and server/.
+
+Source models and conversion previews are excluded from the release; runtime GLBs are included.
