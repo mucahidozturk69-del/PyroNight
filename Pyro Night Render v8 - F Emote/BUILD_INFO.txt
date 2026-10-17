@@ -1,0 +1,6 @@
+PYRO NIGHT — CURRENT RENDER BUILD
+Version: v8
+Controls: F = emote, X = light selected firework, E = catalogue, Backspace = remove selected item.
+
+Use the files in this folder (or the contents of pyro-night-render-v8-f-emote.zip) as the current project when updating GitHub. Replace the old repository files, commit/push, then redeploy the Render service from that repository.
+Render start command: node server/server.js
