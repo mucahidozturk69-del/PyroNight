@@ -11,13 +11,13 @@ End If
 On Error Resume Next
 Set req = CreateObject("WinHttp.WinHttpRequest.5.1")
 req.SetTimeouts 500, 500, 500, 1000
-req.Open "GET", "http://127.0.0.1:8788/health", False
+req.Open "GET", "http://127.0.0.1:8789/health", False
 req.Send
 already = (Err.Number = 0 And req.Status = 200 And InStr(1, req.ResponseText, """ok"":true", vbTextCompare) > 0)
 Err.Clear
 On Error GoTo 0
 If already Then
-  sh.Run "http://localhost:8788", 1, False
+  sh.Run "http://localhost:8789", 1, False
   WScript.Quit 0
 End If
 rc = sh.Run("cmd.exe /c node -e ""process.exit(Number(process.versions.node.split('.')[0]) >= 18 ? 0 : 1)""", 0, True)
@@ -35,7 +35,7 @@ For attempts = 1 To 12
   On Error Resume Next
   Set req = CreateObject("WinHttp.WinHttpRequest.5.1")
   req.SetTimeouts 500, 500, 500, 1000
-  req.Open "GET", "http://127.0.0.1:8788/health", False
+  req.Open "GET", "http://127.0.0.1:8789/health", False
   req.Send
   already = False
   If Err.Number = 0 Then
@@ -51,4 +51,4 @@ If Not already Then
   MsgBox "The local server did not start. Check " & logFile & " for details.", vbExclamation, "Pyro Night"
   WScript.Quit 1
 End If
-sh.Run "http://localhost:8788", 1, False
+sh.Run "http://localhost:8789", 1, False

@@ -1,6 +1,6 @@
 'use strict';
 /* Pyro Night room server. No npm packages needed: `node server.js`.
-   - serves the game files (so http://localhost:8788 works) and WebSocket on the same port
+   - serves the game files (so http://localhost:8789 works) and WebSocket on the same port
    - rooms with custom codes, host-only settings, chat (room + global), map gallery with authors
    - relays gameplay events between players in a room; the host owns shared settings and the nextbot */
 const http = require('node:http');
@@ -8,7 +8,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 
-const PORT = Number(process.env.PORT || 8788);
+const PORT = Number(process.env.PORT || 8789);
 const ROOT = path.resolve(__dirname, '..');
 const ORIGINS = (process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean); // empty = allow all
 const MAX_ROOM = 5;

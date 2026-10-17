@@ -6,7 +6,7 @@ build and publish maps, and play with friends in rooms with your own room codes.
 **Target platform: CrazyGames only.** Nothing here is prepared for other stores.
 
 ## Quick start
-For local multiplayer, extract the **entire ZIP** to a normal folder first (do not run the launcher inside WinRAR), then double-click `START_PYRO_NIGHT.vbs`. It starts the included server in the background (no terminal window) and opens the game at http://localhost:8788. Server diagnostics go to `%TEMP%\pyro-night-server.log`. Alternatively, open a terminal in `server` and run `node server.js`. Node 18+ is required; there are **no npm packages** to install. Opening `index.html` by itself does not start the multiplayer server.
+For local multiplayer, extract the **entire ZIP** to a normal folder first (do not run the launcher inside WinRAR), then double-click `START_PYRO_NIGHT.vbs`. It starts the included server in the background (no terminal window) and opens the game at http://localhost:8789. Server diagnostics go to `%TEMP%\pyro-night-server.log`. Alternatively, open a terminal in `server` and run `node server.js`. Node 18+ is required; there are **no npm packages** to install. Opening `index.html` by itself does not start the multiplayer server.
 
 ## Maps (pick in the Maps tab, host picks for a room)
 | Map | What it is |
