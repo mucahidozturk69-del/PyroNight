@@ -556,7 +556,7 @@ A_('Red Smoke Ball','Ground','K',{d:8,cs:[RED,[1,.5,.3]]},['#b71c1c','#ffcdd2','
 A_('Yellow Smoke Ball','Ground','K',{d:8,cs:[[1,.9,.2],[1,.7,.1]]},['#f9a825','#fff9c4','stripes','orb'],'Yellow smoke');
 A_('Thunder Pack','Crackers','X',{n:100},['#b71c1c','#fff59d','dragon','pack'],'One hundred bangs');
 A_('Big Cannonball','Crackers','X',{n:1,big:1,pw:.7},['#111111','#ff1744','stripes','cube'],'One enormous bang');
-A_('Flowery','Special','F',{},['#f5d000','#e07020','checker','box'],'Flowery: walks after you, and every 5 seconds he RUSHES at triple speed with a rush sound. Has its own music. In multiplayer only the host can place him.');
+A_('Flowery','Special','F',{bot:'flowery'},['#f5d000','#e07020','checker','box'],'Flowery: walks after you, and every 5 seconds he RUSHES at triple speed with a rush sound. Has its own music. In multiplayer only the host can place him.');
 A_('Nextbot','Special','N',{},['#10131f','#ff3b30','checker','box'],'A chasing nextbot. Music plays when it is near. In multiplayer only the host can place it.');
 A_('Flowery Firework','Special','S',{t:31,flower:1,pal:[[1,.85,.12],[1,.5,.1]]},['#f5d000','#e07020','stripes','ball'],'A burst of Flowery picture sparks that float across the sky');
 A_('Omega Flowery Firework','Special','S',{t:32,flower:1,pal:[[1,.85,.12],[1,.5,.1]]},['#ffe066','#d4380d','dragon','ball'],'OMEGA: a huge golden burst that shoots out a ring of Flowery fireworks');
@@ -589,7 +589,7 @@ const chicaSprites=[],chicaFlights=[];const CHICA_MAX=128;
 function getChicaSprite(){let s=chicaSprites.find(q=>!q.userData.busy);if(!s&&chicaSprites.length<CHICA_MAX){s=new THREE.Sprite(new THREE.SpriteMaterial({map:chicaTexture,transparent:true,alphaTest:.025,depthWrite:false,fog:false}));s.frustumCulled=false;s.visible=false;s.userData.busy=false;scene.add(s);chicaSprites.push(s)}return s}
 function spawnChicas(p){for(let i=0;i<36;i++){const s=getChicaSprite();if(!s)break;const d=rdir(),speed=10+R()*10,life=3.5+R()*1.2,size=2.3+R()*1.8;s.userData.busy=true;s.visible=true;s.position.set(p.x,p.y,p.z);s.scale.set(size,size,1);s.material.opacity=1;s.material.rotation=R()*TAU;chicaFlights.push({s,vx:d[0]*speed,vy:5+d[1]*12+R()*2,vz:d[2]*speed,life,maxLife:life,spin:(R()-.5)*3.4,size})}}
 function stepChicas(dt){for(let i=chicaFlights.length-1;i>=0;i--){const e=chicaFlights[i];e.life-=dt;if(e.life<=0){e.s.visible=false;e.s.userData.busy=false;chicaFlights.splice(i,1);continue}e.vy-=6.8*dt;e.vx+=ST.wind*.12*dt;const drag=Math.exp(-.16*dt);e.vx*=drag;e.vz*=drag;e.s.position.x+=e.vx*dt;e.s.position.y+=e.vy*dt;e.s.position.z+=e.vz*dt;e.s.material.rotation+=e.spin*dt;e.s.material.opacity=Math.min(1,e.life/.7);const scale=e.size*(.88+.12*Math.min(1,e.life/e.maxLife));e.s.scale.set(scale*(e.arx||1),scale*(e.ary||1),1)}}
-const botTextureFiles={sanic:'sanic.png',mario:'mario.png',nextbot:'nextbot.jpg',flowery:'flowery.png'},botTextures={},botSprites=[],botFlights=[];const botTextureLoader=new THREE.TextureLoader();
+const botTextureFiles={sanic:'sanic.png',mario:'mario.png',nextbot:'nextbot-burst.svg',flowery:'flowery.png'},botTextures={},botSprites=[],botFlights=[];const botTextureLoader=new THREE.TextureLoader();
 for(const [k,file] of Object.entries(botTextureFiles)){const tx=botTextureLoader.load('assets/'+file);tx.colorSpace=THREE.SRGBColorSpace;tx.magFilter=THREE.LinearFilter;tx.anisotropy=4;botTextures[k]=tx}
 function getBotSprite(key){if(key==='multiverse')key=['sanic','mario','nextbot','flowery'][Math.random()*4|0];let s=botSprites.find(x=>!x.userData.busy&&x.userData.theme===key);if(!s&&botSprites.length<128){s=new THREE.Sprite(new THREE.SpriteMaterial({map:botTextures[key],transparent:true,alphaTest:.03,depthWrite:false,fog:false}));s.frustumCulled=false;s.visible=false;s.userData.busy=false;s.userData.theme=key;scene.add(s);botSprites.push(s)}return s}
 function spawnBotBurst(p,key){const n=key==='multiverse'?54:key==='nextbot'?36:28;for(let i=0;i<n;i++){const k=key==='multiverse'?['sanic','mario','nextbot','flowery'][i%4]:key,s=getBotSprite(k);if(!s)break;const d=rdir(),speed=(9+R()*12)*(key==='multiverse'?1.12:1),life=2.65+R()*1.35,size=(key==='multiverse'?1.5:1.65)+R()*(key==='multiverse'?1.6:1.5);s.userData.busy=true;s.visible=true;s.position.set(p.x,p.y,p.z);s.scale.set(size*1.08,size,1);s.material.rotation=R()*TAU;s.material.opacity=1;botFlights.push({s,vx:d[0]*speed,vy:5+d[1]*15+R()*3,vz:d[2]*speed,life,maxLife:life,spin:(R()-.5)*4,size,bounce:0})}}
@@ -736,25 +736,39 @@ let playerAvatarGLTF=null,playerAvatarLoading=false;
 function playerColorValue(c){return /^#[0-9a-f]{6}$/i.test(c||'')?c:'#d14a2c'}
 function applyAvatarBodyColor(wrapper,color){if(!wrapper)return;const hex=playerColorValue(color);wrapper.userData.bodyColor=hex;const root=wrapper.userData.playerRoot;if(root)root.traverse(o=>{if(!o.isMesh||!o.material)return;for(const m of(Array.isArray(o.material)?o.material:[o.material]))if(m.color)m.color.set(hex)})}
 function avatarOffset(u,name,x,y,z){const b=u.avatarBones&&u.avatarBones[name.toLowerCase()],base=b&&u.avatarBases&&u.avatarBases.get(b);if(!b||!base)return;b.quaternion.copy(base).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(x||0,y||0,z||0,'XYZ')))}
-function animateAvatarPose(u,swing,light,rag,t){
+function animateAvatarPose(u,swing,light,rag,t,airborne=false,verticalSpeed=0){
+ const stride=Math.max(-1,Math.min(1,swing*1.35)),idle=Math.sin(t*2.15),stumble=rag?Math.sin(t*15):0;
  if(u.avatarBones){
-  const step=rag?Math.sin(t*14)*.7:swing*.27,arm=rag?Math.sin(t*17)*.65:(light?-.23:0);
-  avatarOffset(u,'upperarm.l',0,0,step+arm);avatarOffset(u,'upperarm.r',0,0,-step-arm);
-  avatarOffset(u,'upperleg.l',0,0,-swing*.42);avatarOffset(u,'upperleg.r',0,0,swing*.42);
-  avatarOffset(u,'lowerleg.l',0,0,Math.max(0,-swing)*.2);avatarOffset(u,'lowerleg.r',0,0,Math.max(0,swing)*.2);
-  avatarOffset(u,'head',0,0,rag?Math.sin(t*12)*.12:Math.sin(t*1.8)*.025);
- }else if(u.aL){u.aL.rotation.x=rag?Math.sin(t*18)*1.4:swing;u.aR.rotation.x=rag?Math.sin(t*16+1)*1.4:light?-1.3:-swing;u.lL.rotation.x=rag?Math.sin(t*14)*.9:-swing;u.lR.rotation.x=rag?Math.sin(t*13+2)*.9:swing}
+  const jump=airborne?(verticalSpeed>0?-.12:.1):0,walkLean=Math.abs(stride)*.045;
+  avatarOffset(u,'chest',jump-walkLean+(rag?stumble*.16:idle*.012),0,rag?Math.sin(t*11)*.1:Math.sin(t*1.3)*.012);
+  avatarOffset(u,'hip',rag?Math.sin(t*12+1)*.18:0,0,rag?Math.sin(t*9)*.08:0);
+  avatarOffset(u,'upperarm.l',-stride*.62+(airborne?-.16:0),0,rag?stumble*.45:.04);
+  avatarOffset(u,'upperarm.r',stride*.62+(airborne?-.16:0)+(light?-.48:0),0,rag?Math.sin(t*17+1)*.5:-.04-(light?.12:0));
+  avatarOffset(u,'lowerarm.l',Math.max(0,stride)*.48+(airborne?-.08:0),0,rag?Math.sin(t*18)*.28:0);
+  avatarOffset(u,'lowerarm.r',Math.max(0,-stride)*.48+(light?-.34:0),0,rag?Math.sin(t*16+1)*.3:0);
+  avatarOffset(u,'upperleg.l',stride*.62+(airborne?.12:0),0,rag?stumble*.5:0);
+  avatarOffset(u,'upperleg.r',-stride*.62+(airborne?.12:0),0,rag?Math.sin(t*14+2)*.5:0);
+  avatarOffset(u,'lowerleg.l',Math.max(0,-stride)*.58+(airborne?-.12:0),0,rag?Math.sin(t*13)*.32:0);
+  avatarOffset(u,'lowerleg.r',Math.max(0,stride)*.58+(airborne?-.12:0),0,rag?Math.sin(t*12+2)*.32:0);
+  avatarOffset(u,'head',airborne?-.04:0,rag?Math.sin(t*12)*.08:Math.sin(t*.8)*.025,rag?Math.sin(t*10)*.12:Math.sin(t*1.8)*.018);
+  if(u.playerRoot&&Number.isFinite(u.avatarRootY))u.playerRoot.position.y=u.avatarRootY+(rag?Math.abs(Math.sin(t*15))*.035:Math.abs(Math.sin(t*10))*Math.min(.022,Math.abs(stride)*.022)+idle*.004);
+ }else if(u.aL){
+  u.aL.rotation.x=rag?Math.sin(t*18)*1.4:-stride*.62+idle*.018;
+  u.aR.rotation.x=rag?Math.sin(t*16+1)*1.4:light?-.95:stride*.62-idle*.018;
+  u.lL.rotation.x=rag?Math.sin(t*14)*.9:stride*.62;
+  u.lR.rotation.x=rag?Math.sin(t*13+2)*.9:-stride*.62;
+ }
 }
 function applyPlayerModel(wrapper,color){
  if(!playerAvatarGLTF||!wrapper)return;
  const tag=wrapper.userData.nameTag||null;if(tag)wrapper.remove(tag);
  for(const child of [...wrapper.children]){wrapper.remove(child);child.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)for(const m of(Array.isArray(o.material)?o.material:[o.material]))m.dispose()})}
  const root=THREE.SkeletonUtils.clone(playerAvatarGLTF.scene);root.updateMatrixWorld(true);
- const bounds=new THREE.Box3().setFromObject(root),size=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3()),scale=1.92/Math.max(.01,size.y);
+ root.position.set(0,0,0);root.scale.setScalar(1);root.updateMatrixWorld(true);const bounds=new THREE.Box3();root.traverse(o=>{if(o.isSkinnedMesh&&o.computeBoundingBox){o.skeleton.update();o.computeBoundingBox();if(o.boundingBox&&!o.boundingBox.isEmpty())bounds.union(o.boundingBox.clone().applyMatrix4(o.matrixWorld))}else if(o.isMesh)bounds.expandByObject(o)});if(bounds.isEmpty())bounds.setFromObject(root);const size=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3()),scale=1.92/Math.max(.01,size.y);
  root.scale.setScalar(scale);root.position.set(-center.x*scale,-bounds.min.y*scale,-center.z*scale);
  const bones={},materialClones=new Map();
- root.traverse(o=>{if(o.isBone)bones[o.name.toLowerCase()]=o;if(o.isMesh){o.castShadow=true;o.receiveShadow=true;const copy=m=>{if(!m)return m;if(!materialClones.has(m))materialClones.set(m,m.clone());return materialClones.get(m)};o.material=Array.isArray(o.material)?o.material.map(copy):copy(o.material)}});
- wrapper.add(root);wrapper.userData.playerRoot=root;wrapper.userData.avatarBones=bones;wrapper.userData.avatarBases=new Map();
+ root.traverse(o=>{if(o.isBone)bones[o.name.toLowerCase()]=o;if(o.isMesh){o.geometry=o.geometry.clone();o.castShadow=true;o.receiveShadow=true;const copy=m=>{if(!m)return m;if(!materialClones.has(m))materialClones.set(m,m.clone());return materialClones.get(m)};o.material=Array.isArray(o.material)?o.material.map(copy):copy(o.material)}});
+ wrapper.add(root);wrapper.userData.playerRoot=root;wrapper.userData.avatarRootY=root.position.y;wrapper.userData.avatarBones=bones;wrapper.userData.avatarBases=new Map();
  for(const b of Object.values(bones))wrapper.userData.avatarBases.set(b,b.quaternion.clone());
  wrapper.userData.aL=bones['upperarm.l'];wrapper.userData.aR=bones['upperarm.r'];wrapper.userData.lL=bones['upperleg.l'];wrapper.userData.lR=bones['upperleg.r'];
  if(wrapper===me&&mf&&bones['hand.r']){mf.position.set(0,.08,-.04);bones['hand.r'].add(mf)}
@@ -835,7 +849,7 @@ function itemById(id){return items.find(i=>i.id===id)}
 function setGhost(it,on){it.m.traverse(o=>{if(o.isMesh&&o.material){if(on)o.material.transparent=true;o.material.opacity=on?ST.gop:1}})}
 function select(it){if(pick&&pick!==it){setGhost(pick,false);grab=false}pick=it;showSel()}
 function spawnItem(i){const f=FW[i];
- if(f.bot&&ExtraBots[f.bot]){ExtraBots[f.bot].placeFromUI();return}if(f.k==='N'){Nextbot.placeFromUI();return}if(f.k==='F'){Flowery.placeFromUI();return}
+ if(f.bot==='flowery'){Flowery.placeFromUI();return}if(f.bot&&ExtraBots[f.bot]){ExtraBots[f.bot].placeFromUI();return}if(f.k==='N'){Nextbot.placeFromUI();return}
  if(items.length>=120){toast('Item limit reached (120)');return}
  let p=gp(),x,z,y;if(p&&Math.hypot(p[0]-PL.x,p[1]-PL.z)>2){x=p[0];z=p[1];y=p[2]}else{cam.getWorldDirection(_gd);const h=Math.hypot(_gd.x,_gd.z)||1;x=PL.x+_gd.x/h*3;z=PL.z+_gd.z/h*3;y=undefined}
  if(!ok(x,z)){x=PL.x;z=PL.z-3;if(!ok(x,z)){x=PL.x;z=PL.z}}
@@ -898,16 +912,16 @@ function world(dt,t){
  }
  if(lightT>0){lightT-=dt;if(lightT<=.55&&lightFor&&!lightFor.state){lightItem(lightFor);if(Net)Net.evt('lit',{id:lightFor.id,by:Net.myId})}if(lightT<=0){lightT=0;lightFor=null}}
  wp+=walk*dt*10;const sw=Math.sin(wp)*.8*Math.min(1,walk),u=me.userData,L1=lightT>0,kk=L1?1:0,rg=ragT>0;me.visible=!!ST.tp&&!!locked&&!emotePlayers.has('local');fp.visible=!ST.tp&&!!locked;
- me.position.set(PL.x,PL.y,PL.z);me.rotation.y=yaw;animateAvatarPose(u,sw,L1,rg,t);me.rotation.x+=((rg?-1.35:0)-me.rotation.x)*Math.min(1,dt*8);
- mf.visible=L1;hand.position.set(.28-.08*kk,-.3+.1*kk,-.52-.12*kk);hand.rotation.set(.2-.9*kk,-.2+.2*kk,0);
- fp.position.y=Math.sin(wp*2)*.012*Math.min(1,walk)*ST.bob;lg.visible=fl.visible=L1;lt.intensity=L1&&!ST.tp?(1.1+.4*Math.sin(t*25))*ST.lfl:0;if(beam)beam.rotation.y+=dt*.6;
+ me.position.set(PL.x,PL.y,PL.z);me.rotation.y=yaw;animateAvatarPose(u,sw,L1,rg,t,!onGround,vy);me.rotation.x+=((rg?-1.35:0)-me.rotation.x)*Math.min(1,dt*8);
+ mf.visible=L1;hand.position.set(.4-.07*kk,-.43+.1*kk,-.62-.1*kk);hand.rotation.set(.2-.9*kk,-.2+.2*kk,0);
+ fp.position.y=Math.sin(wp*2)*.018*Math.min(1,walk)*ST.bob;fp.position.x=Math.sin(wp)*.012*Math.min(1,walk);lg.visible=fl.visible=L1;lt.intensity=L1&&!ST.tp?(1.1+.4*Math.sin(t*25))*ST.lfl:0;if(beam)beam.rotation.y+=dt*.6;
  if(grab&&pick&&locked){const p=gp();if(p){let x=p[0],z=p[1];if(ST.snap>0){x=Math.round(x/ST.snap)*ST.snap;z=Math.round(z/ST.snap)*ST.snap}if(ok(x,z)){const su=surface(x,z,p[2]);pick.x=x;pick.z=z;pick.y=su.y;pick.weld=su.prop;applyXf(pick)}}}
  selRing.visible=!!pick&&!!locked;if(pick){selRing.position.set(pick.x,pick.y+.02,pick.z);selRing.material.color.set(pick.state?0xff5533:grab?0x66ccff:0xffd27a);selRing.material.opacity=.3+.15*Math.sin(t*5)}
 }
 // ---- catalogue and placed-items panels
 const CATS=['All','Shells','Rockets','Cakes','Candles & mines','Ground','Crackers','Special'];let cat='All',powerSort=1;
 const SPECIAL_NAMES=new Set(['Flowery','Nextbot','Flowery Firework','Omega Flowery Firework','Chica Firework','Sanic Nextbot','Mario Nextbot','Sanic Sonic Spiral','Mario Coin Comet','Nextbot Panic Swarm','Flowery Rush Bloom','Nextbot Multiverse Finale']);
-function thumb(f){if(f.botFx==='sanic')return 'assets/sanic.png';if(f.botFx==='mario')return 'assets/mario.png';if(f.botFx==='nextbot')return 'assets/nextbot.jpg';if(f.botFx==='flowery')return 'assets/flowery.png';if(f.botFx==='multiverse')return 'assets/nextbot.jpg';if(f.bot==='sanic')return 'assets/sanic.png';if(f.bot==='mario')return 'assets/mario.png';if(f.chica)return 'assets/chica.png';if(f.flower)return 'assets/flowery.png';if(f.k==='N')return 'assets/nextbot.jpg';if(f.k==='F')return 'assets/flowery.png';if(!f.th){try{const k=document.createElement('canvas');k.width=k.height=64;k.getContext('2d').drawImage(tx(f),0,0,64,64);f.th=k.toDataURL('image/jpeg',.8)}catch(e){f.th=''}}return f.th}
+function thumb(f){if(f.botFx==='sanic')return 'assets/sanic.png';if(f.botFx==='mario')return 'assets/mario.png';if(f.botFx==='nextbot')return 'assets/nextbot-burst.svg';if(f.botFx==='flowery')return 'assets/flowery.png';if(f.botFx==='multiverse')return 'assets/nextbot-multiverse.svg';if(f.bot==='sanic')return 'assets/sanic.png';if(f.bot==='mario')return 'assets/mario.png';if(f.bot==='flowery')return 'assets/flowery.png';if(f.chica)return 'assets/chica.png';if(f.flower)return 'assets/flowery.png';if(f.k==='N')return 'assets/nextbot.jpg';if(!f.th){try{const k=document.createElement('canvas');k.width=k.height=64;k.getContext('2d').drawImage(tx(f),0,0,64,64);f.th=k.toDataURL('image/jpeg',.8)}catch(e){f.th=''}}return f.th}
 PANELS.inv={title:'Catalogue',sub:()=>FW.length+' fireworks. Click one to spawn it in front of you, then click to place it.',html:()=>{const unlit=items.filter(i=>!i.state).length,nb=Nextbot.exists(),specialCount=FW.filter(f=>f.cat==='Special'||SPECIAL_NAMES.has(f.nm)).length;
  return '<div class=row><button class="btn pri" data-act=ignite>Ignite all ('+unlit+' unlit)</button><button class=btn data-sortpower>Power: '+(powerSort===1?'10 → 1':'1 → 10')+'</button><span class=pill>'+items.length+' placed</span></div><div class=chips>'+CATS.map(c=>'<button data-c="'+c+'"'+(c==cat?' class=on':'')+'>'+(c==='Special'?'Special ('+specialCount+')':c)+'</button>').join('')+'</div><div class=inv>'+(()=>{const rows=FW.map((f,i)=>({f,i})).filter(({f})=>cat=='All'||f.cat==cat||(cat=='Special'&&SPECIAL_NAMES.has(f.nm)));rows.sort((a,b)=>(b.f.power-a.f.power)*powerSort||a.f.nm.localeCompare(b.f.nm));return rows.map(({f,i})=>'<button data-f='+i+' title="Power '+f.power+' / 10"><img src='+thumb(f)+'><span>'+f.nm+'</span><small class=pwr>POWER '+f.power+'/10</small></button>').join('')})()+'</div><div class=tip id=info>Hover a firework for details.'+(nb?' The nextbot is placed.':'')+'</div>'}};
 pn.addEventListener('click',e=>{const sort=e.target.closest('button[data-sortpower]');if(sort){powerSort*=-1;refresh();return}const c=e.target.closest('button[data-c]');if(c){cat=c.dataset.c;refresh()}const b=e.target.closest('button[data-f]');if(b){spawnItem(+b.dataset.f);if(FW[+b.dataset.f].k!=='N')startPlay()}const a=e.target.closest('button[data-act]');if(a&&a.dataset.act=='ignite'){igniteAll();refresh()}});
@@ -919,7 +933,7 @@ function wipe(fromNet){for(const it of items)scene.remove(it.m);items.length=0;s
 pn.addEventListener('click',e=>{const b=e.target.closest('button[data-a]');if(!b)return;const a=b.dataset.a;let msg='';
  if(a=='fire')igniteAll();else if(a=='rearm'){sched.length=0;FX.length=0;items.forEach(rearm);msg='All items re-armed.'}else if(a=='clear')wipe();
  else if(a[0]=='s'||a[0]=='l'){const key='pyroShow'+a[1];try{if(a[0]=='s'){localStorage.setItem(key,JSON.stringify(items.map(t=>[t.i,+t.x.toFixed(2),+t.z.toFixed(2),+t.rot.toFixed(3),+t.tilt.toFixed(3),+t.y.toFixed(2)])));msg='Saved '+items.length+' items to slot '+a[1]+'.'}
-  else{const d=JSON.parse(localStorage.getItem(key)||'null');if(!d)msg='Slot '+a[1]+' is empty.';else{wipe();d.forEach(q=>{if(FW[q[0]]&&FW[q[0]].k!=='N'&&FW[q[0]].k!=='F'){const it=addItem(q[0],q[1],q[2],q[3],q[4],q[5]);if(Net)Net.itemAdded(it)}});msg='Loaded '+d.length+' items.'}}}catch(err){msg='Saving is not available here.'}}
+  else{const d=JSON.parse(localStorage.getItem(key)||'null');if(!d)msg='Slot '+a[1]+' is empty.';else{wipe();d.forEach(q=>{if(FW[q[0]]&&FW[q[0]].k!=='N'){const it=addItem(q[0],q[1],q[2],q[3],q[4],q[5]);if(Net)Net.itemAdded(it)}});msg='Loaded '+d.length+' items.'}}}catch(err){msg='Saving is not available here.'}}
  refresh();const f=$('info');if(f&&msg)f.textContent=msg});
 const ft=[];let lp=performance.now(),sa=0;
 function paint(avg,fps,low){const b=$('fbig');if(!b)return;b.textContent=Math.round(fps)+' fps';const c=$('fg').getContext('2d');c.clearRect(0,0,720,90);ft.forEach((v,i)=>{c.fillStyle=v<17.5?'#6fdc8c':v<34?'#ffd54f':'#ff6b6b';const h=Math.min(1,v/50)*88;c.fillRect(i*2.4,90-h,2,h)});let n=0;for(let i=0;i<N;i++)if(L[i]>0)n++;$('ftxt').textContent='Average '+avg.toFixed(1)+' ms - 1% low '+low.toFixed(0)+' fps - particles '+n+' - shells '+shells.length+' - items '+items.length+' - draw calls '+rd.info.render.calls+' - triangles '+rd.info.render.triangles+' - quality '+QN[ST.q]}
