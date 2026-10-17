@@ -18,9 +18,9 @@ For local multiplayer, extract the **entire ZIP** to a normal folder first (do n
 | Dreamcore Meadow | Rolling grass, pastel rainbow portal, floating clouds, a pale cottage and liminal landmarks |
 
 ## Controls
-On touchscreens, use the left joystick to move, drag the right side of the screen to look, and use the on-screen Jump, Run, Light, Ignite, Use, Move, Turn, Items, Chat and Menu buttons. Tap the world to select or place a firework.
+On touchscreens, use the left joystick to move, drag the right side of the screen to look, and use the on-screen Jump, Run, Light, Ignite, Emote, Items and Menu buttons. Tap More for Use, Move, Turn and Chat. Tap the world to select or place a firework.
 
-On desktop, WASD move, Shift sprint, Space jump, mouse look (right-drag if the browser blocks mouse capture). **E** catalogue (click a firework to spawn it),
+On desktop, WASD move, Shift sprint, Space jump, mouse look (right-drag if the browser blocks mouse capture). **E** emote, **C** catalogue (click a firework to spawn it),
 click to place/select, **G** move, **R** rotate, **T** tilt, **X** remove, **F** light, **Enter** ignite all, **Q** use doors/lamps/TVs,
 **V** camera, **/** chat, **Tab** players, **M** map creator, **I** or the gear for settings, **O** world, **H** hide UI.
 
