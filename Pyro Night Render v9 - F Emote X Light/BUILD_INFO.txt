@@ -1,0 +1,6 @@
+PYRO NIGHT — CURRENT RENDER BUILD
+Version: v9
+Controls: F = emote (even if pointer lock is unavailable), X = light selected firework, E = catalogue, Backspace = remove selected item.
+
+Use the files in this folder (or the contents of the ZIP) as the current project when updating GitHub. Replace the old repository files, commit/push, then redeploy the Render service from that repository. This local package does not update GitHub or Render by itself.
+Render start command: node server/server.js
